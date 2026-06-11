@@ -1,0 +1,29 @@
+# Ground Cyber closure audit — dogfood run for this repository.
+#
+# Scoped to secret-scanning alerts: the default Actions GITHUB_TOKEN cannot
+# read Dependabot alerts, and code scanning is not configured on this repo.
+
+name: Ground Cyber Closure Audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
+  security-events: read
+
+jobs:
+  closure-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Ground Cyber
+        uses: sergiumargan-sudo/ground-cyber-plugin@main
+        with:
+          alerts: "secret-scanning"
+          output: "markdown,json"
+          fail-on-gcs3: "false"
+          fail-on-gcs4: "true"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
